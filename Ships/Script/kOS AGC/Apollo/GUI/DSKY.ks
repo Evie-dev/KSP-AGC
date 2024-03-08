@@ -1377,7 +1377,8 @@ LOCAL FUNCTION SIGN {
 LOCAL FUNCTION DO_NOUN_PROCESSOR {
     parameter DISP is DSPOUT:COPY.
     local _nd is DISP:ND.
-
+    local _vd is DISP:VD.
+    IF _vd = "33" { return false. }
     IF LIST("01", "02", "03"):contains(_nd) {
         return true.
     }
@@ -1467,6 +1468,7 @@ LOCAL FUNCTION NOUN_PROCESSOR {
             local _definedECADR is _N01_ECADR:tonumber(-1):tostring.
             EMEM_WRITE(_definedECADR, displayState:R1).
             set _N01_STEP TO "AWAIT2".
+            IF _N01_AUTOSEQUENTIAL { NOUN_PROCESSOR(). }
         } ELSE IF _N01_STEP = "AWAIT2" {
             IF _N01_AUTOSEQUENTIAL {
                 local _dec is Tobase(8,10,_N01_ECADR:tonumber(-1)).
@@ -1593,7 +1595,12 @@ LOCAL FUNCTION VERB_PROCESSOR {
         } ELSE IF processingVerb = 32 {
 
         } ELSE IF processingVerb = 33 {
-
+            IF EMEM_READ("PROGRAM") = 27 and EMEM_READ("PROGRAM_STEP") = 3 {
+                // commit!
+                set _N01_AUTOSEQUENTIAL to false.
+                P27_COMMIT().
+            }
+            GOTO_P00H().
         } ELSE IF processingVerb = 34 {
             ERASABLE_FRESH_START().
         } ELSE IF processingVerb = 35 {

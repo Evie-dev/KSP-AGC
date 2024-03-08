@@ -49,7 +49,7 @@ FUNCTION CHANGE_PROGRAM {
     ELSE IF programNumber = 11 {
         P11_INIT(asRestart).
     } ELSE IF programNumber = 27 {
-        P27_INIT().
+        //P27_INIT(). <- DO NOT
     } 
     ELSE IF programNumber = 30 {
         P30_INIT(asRestart).
