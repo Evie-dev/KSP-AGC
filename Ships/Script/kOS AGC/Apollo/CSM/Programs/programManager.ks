@@ -49,13 +49,7 @@ FUNCTION CHANGE_PROGRAM {
     ELSE IF programNumber = 11 {
         P11_INIT(asRestart).
     } ELSE IF programNumber = 27 {
-        IF hasnode {
-            EMEM_WRITE("DELTAVLVC", v(nextnode:radialout, nextnode:normal, nextnode:prograde)).
-            local ndT is nextNode:TIME.
-            EMEM_WRITE("TIG", ndT-EMEM_READ("TIME0")).
-            remove nextNode.
-        }
-        EMEM_SAVE().
+        P27_INIT().
     } 
     ELSE IF programNumber = 30 {
         P30_INIT(asRestart).

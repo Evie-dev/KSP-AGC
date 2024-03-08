@@ -179,7 +179,7 @@ FUNCTION fractionalDecimalToOctal {
 
 }
 
-// in an ideal world this function needn't exist, however kos is fucking stupid and doesnt like big numbers, use this function if your conversion goes ary!
+// in an ideal world this function needn't exist, however kos is big dumb stupid and doesnt like big numbers, use this function if your conversion goes ary!
 function scuffedBinaryToDecimalConverter {
     parameter inp is "0".
 

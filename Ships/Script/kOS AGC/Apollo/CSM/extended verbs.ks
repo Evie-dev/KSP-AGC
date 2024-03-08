@@ -50,6 +50,8 @@ FUNCTION VERB_PROCESSOR_EXTENDED {
         } ELSE IF processingVerb = 72 {
             P27_VERBSET(2).
         }
+        DSKY_SETFLAG("DSPLOCK", FALSE).
+        NVSUB(1,1).
     }
 
 

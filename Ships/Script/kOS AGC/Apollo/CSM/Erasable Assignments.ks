@@ -283,13 +283,13 @@ LOCAL FUNCTION ASSIGN_ERASABLES {
     EMEM_CREATE("ROUTINE_STEP").
 
 
-    // create UPBUFF - ADDRESS 300(8) to 300(8)+20(10)
+    // create UPBUFF - ADDRESS 304(8) to 300(8)+20(10)
     
     local _UB is "UPBUFF".
     local _currentUpbuff is 0.
     local _maxUpbuff is 20. // 24 octal
-    local _decAddress is tobase(8,10,300).
-    local _octAddress is tobase(10,8,300).
+    local _decAddress is tobase(8,10,304).
+    local _octAddress is tobase(10,8,304).
 
     UNTIL _currentUpbuff > _maxUpbuff {
         set _octAddress to tobase(10,8,_decAddress).

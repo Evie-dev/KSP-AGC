@@ -1233,6 +1233,7 @@ GLOBAL _KEYRUPT_VALUES is list("0", "1","2","3","4","5","6","7","8","9","VERB", 
 GLOBAL DSPLOCK IS FALSE.
 FUNCTION KEYBOARD_INPUT {
     parameter keycode is "".
+    print keycode.
     IF keycode = "PRO" or keycode = "P" {
         KEYRUPT1("PRO").
         return.
@@ -1242,7 +1243,9 @@ FUNCTION KEYBOARD_INPUT {
 
 FUNCTION UPLINK_INPUT {
     parameter keycode is "".
-    KEYRUPT1(PINBALL_UPLINK_WORDS(keycode)).
+    local _keycode is PINBALL_UPLINK_WORDS(keycode).
+    print "_keycode: " + _keycode.
+    KEYRUPT1(_keycode).
 }
 
 LOCAL FUNCTION KEYRUPT1 {
@@ -1431,7 +1434,34 @@ LOCAL FUNCTION NOUN_PROCESSOR {
             
             set _N01_STEP to "DATA".
             set INPREMAIN to 5.
-        } ELSE IF _N01_STEP = "DATA" {
+        } ELSE IF _N01_STEP = "ECADR2" {
+            local _tempecadr is _N01_ECADR.
+            local _formedECADR is "".
+            for i in _tempecadr {
+                IF NOT(i = "b") {
+                    set _formedECADR to _formedECADR+i.
+                }
+            }
+            // now we just remove the decimal point
+
+            set _N01_ECADR to _formedECADR.
+            IF _N01_ECADR:tonumber(-1) < 0 {
+                // opr err! (honestly idk what to do with this one)
+
+                return.
+            }
+
+            print "ECADR: " + _N01_ECADR.
+
+            BLANK5("R1"). // blank R1 and push to R3
+            BLANK5("R3").
+            set DSPOUT:R3 to "b" + stringLengthener(_N01_ECADR, 5, "b").
+            
+            set _N01_STEP to "DATA".
+            set INPLOCK to "R1".
+            set INPREMAIN to 5.
+        } 
+        ELSE IF _N01_STEP = "DATA" {
             
             // push the data into the ECADR provided...
             local _definedECADR is _N01_ECADR:tonumber(-1):tostring.
@@ -1441,7 +1471,7 @@ LOCAL FUNCTION NOUN_PROCESSOR {
             IF _N01_AUTOSEQUENTIAL {
                 local _dec is Tobase(8,10,_N01_ECADR:tonumber(-1)).
                 set _N01_ECADR to tobase(10,8,_dec+1):tostring.
-                set _N01_STEP to "ECADR".
+                set _N01_STEP to "ECADR2".
                 NOUN_PROCESSOR(). // hopefully doesnt cause an overflow
             }
         }
@@ -1629,8 +1659,7 @@ FUNCTION NVSUB {
         set DSPOUT:VD to _verb.
         set DSPOUT:ND to _noun.
         set NVFLASH to doFlash.
-        updateAllDisplays().
-        VERB_PROCESSOR().
+        ENTER().
         
     }
 }
@@ -2049,6 +2078,7 @@ FUNCTION PINBALL_UPLINK_WORDS {
     IF _KEYRUPT_VALUES:contains(wordAction) {
         return UPRUPT_WORDS[_KEYRUPT_VALUES:FIND(wordAction)].
     } ELSE IF UPRUPT_WORDS:contains(wordAction) {
+        print _KEYRUPT_VALUES[UPRUPT_WORDS:FIND(wordAction)].
         return _KEYRUPT_VALUES[UPRUPT_WORDS:FIND(wordAction)].
     } ELSE {
         return "0".
@@ -2064,7 +2094,15 @@ FUNCTION PINBALL_KEYBOARD_WORDS {
     } ELSE IF KEYRUPT_WORDS:contains(wordAction) {
         return _KEYRUPT_VALUES[KEYRUPT_WORDS:find(wordAction)].
     } ELSE IF TERMINAL_WORDS:contains(wordAction) {
-        return _KEYRUPT_VALUES[TERMINAL_WORDS:find(wordAction)].
+        return KEYRUPT_WORDS[TERMINAL_WORDS:find(wordAction)].
+    }
+}
+
+FUNCTION PINBALL_TERMINAL_WORDS {
+    parameter wordAction is "N".
+
+    IF TERMINAL_WORDS:contains(wordAction) {
+        return KEYRUPT_WORDS[TERMINAL_WORDS:find(wordAction)].
     }
 }
 
@@ -2493,7 +2531,7 @@ FUNCTION DSKY_JSON_INPUT {
     IF kOSAGCCONFIG:TERMinput {
         IF TERMINAL:INPUT:haschar {
             local ichar is TERMINAL:INPUT:GETCHAR().
-            KEYRUPT1(ichar).
+            KEYBOARD_INPUT(PINBALL_TERMINAL_WORDS(ichar)).
 
         }
     }
