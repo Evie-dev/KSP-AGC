@@ -1,3 +1,6 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
 // EXTENDED VERBS
 
 GLOBAL EXTENDED_VERBS_ARE_AVAILABLE IS TRUE. // tells the DSKY program that EVERBS are available
@@ -51,7 +54,7 @@ FUNCTION VERB_PROCESSOR_EXTENDED {
             P27_VERBSET(2).
         }
         DSKY_SETFLAG("DSPLOCK", FALSE).
-        NVSUB(1,1).
+        
     }
 
 

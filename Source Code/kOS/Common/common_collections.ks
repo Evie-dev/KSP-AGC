@@ -1,3 +1,6 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
 GLOBAL _COMMONFUNC_COLLECTIONS_AVAILABLE IS TRUE.
 
 FUNCTION addToList {

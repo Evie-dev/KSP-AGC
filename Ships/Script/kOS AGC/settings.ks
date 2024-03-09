@@ -1,3 +1,6 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
 // settings loader, uses kOSAGCextras
 GLOBAL _KOSAGCVERSION IS "0.1". // used to determine how we load the memory structure (DO NOT CHANGE THIS UNLESS YOU WANT TO EXPERIMENT OR REALLY MESS STUFF UP!)
 

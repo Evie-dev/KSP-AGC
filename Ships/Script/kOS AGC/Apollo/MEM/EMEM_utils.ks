@@ -1,3 +1,6 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
 // designed to run once upon the update of kOS-AGC
 LOCAL _CMPART IS LIST("bluedog.Apollo.CrewPod", "bluedog.Apollo.CrewPod.5crew").
 LOCAL _LMPART IS LIST("bluedog.LM.Taxi", "bluedog.LM.Shelter", "bluedog.LM.Ascent.Cockpit").

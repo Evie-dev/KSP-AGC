@@ -1,3 +1,6 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
 // R30 - Orbit parameter display
 
 local averG is true. // locked to true, for now until i impliment a proper flag system

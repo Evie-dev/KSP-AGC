@@ -1,4 +1,5 @@
-
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
 
 
 IF AG1 { AG1 OFF.}
@@ -1774,16 +1775,19 @@ FUNCTION NVSUB {
 FUNCTION DSKY_UPDATE {
     checkForUI().
     IF time:seconds > lastOUT0+OUT0rate {
+        // Here we look for inputs
         OUT0().
         set lastOUT0 to time:seconds.
     }
     IF time:seconds > lastREFRESH+REFRESHrate {
+        // here we refresh the display
         DSKY_REFRESH().
         IF NOT(CHUNKrefresh) { INDICATOR_REFRESH(). }
         // during chunk refresh, INDICATOR is handled within the function itself
         set lastREFRESH to time:seconds.
     }
     IF MONFLAG and time:seconds > lastMON+monRefresh {
+        // here we are updating MONITOR functionality
         NVSUB(MONVERB, MONNOUN).
         set lastMON to time:seconds.
     }
@@ -1935,7 +1939,7 @@ LOCAL FUNCTION DSKY_REFRESH {
         IF kOSAGCCONFIG:JSONoutput AND DISPLAYABLE {
             DSKY_JSON_OUTPUT().
         }
-        IF kOSAGCCONFIG:TERMinput and CHUNKnumber = 5 or chunkNumber = 10  {
+        IF kOSAGCCONFIG:TERMinput AND DISPLAYABLE {
             DSKY_JSON_INPUT().
         }
     } ELSE {

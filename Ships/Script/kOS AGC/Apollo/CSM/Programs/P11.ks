@@ -1,4 +1,7 @@
 
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
 local _P11refresh is 2. // 1 refresh every 2 seconds
 local _P11lastrefresh is 0.
 

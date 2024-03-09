@@ -1,3 +1,6 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
 // PROGRAM 2
 
 // Sets up the LIFTOFF DISCRITE LISTENER

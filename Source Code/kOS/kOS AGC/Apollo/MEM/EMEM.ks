@@ -1,3 +1,6 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
 // Some usage guidelines
 
 // before using any new memory location, it is up to the program or code you wish to use the variable to first save it. its henceforth recomended to place EMEM_CREATE
@@ -11,8 +14,6 @@
 
 // future additions: 
 // Enhance memory locations
-
-runOncePath("0:/Common/Externally Sourced Libraries/navball.ks").
 
 
 // init vars

@@ -1,3 +1,6 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
 // DAP DATA MODIFICATION
 
 local _V04N46 IS FALSE.

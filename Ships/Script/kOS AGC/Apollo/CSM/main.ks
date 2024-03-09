@@ -1,3 +1,6 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
 // before we do anything
 GLOBAL AGC_GUIDANCE_INFORMATION IS LEXICON(
     "PERMIT", LEXICON("AUTOMNV", FALSE, "IGNITION", FALSE),

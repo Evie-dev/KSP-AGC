@@ -1,3 +1,6 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
 
 FUNCTION ACTIVATE_DAP {
     // changes or activates the dap settings

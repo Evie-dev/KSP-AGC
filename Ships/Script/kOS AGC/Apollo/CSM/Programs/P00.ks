@@ -1,3 +1,6 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
 // P00 - IDLE PROGRAM
 
 FUNCTION P00_INIT {

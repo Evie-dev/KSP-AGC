@@ -1,3 +1,5 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
 // functions relating to parts and part actions
 
 GLOBAL _COMMONFUNC_PARTS_AVAILABLE IS TRUE.

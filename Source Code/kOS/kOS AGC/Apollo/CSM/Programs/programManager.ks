@@ -1,3 +1,7 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
+
 GLOBAL PROGRAMS_ARE_AVAILABLE IS TRUE.
 
 GLOBAL PROGRAM_PROGRESSION_INHIBIT IS TRUE. // by default enabled because most programs require automatic progression

@@ -1,3 +1,6 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
 // PROGRAM 1 - Honestly somewhat useless at the moment
 
 local IMUbaseAlignmenttime is 90. // the default alignment time

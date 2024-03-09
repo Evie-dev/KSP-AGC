@@ -1,3 +1,9 @@
+
+//Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// Copyrighted under the MIT License
+
+
+
 GLOBAL _COMMONFUNC_USEFUL_AVAILABLE IS TRUE.
 
 

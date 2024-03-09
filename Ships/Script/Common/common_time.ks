@@ -1,3 +1,5 @@
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
 GLOBAL _COMMONFUNC_TIME_AVAILABLE IS TRUE.
 
 
