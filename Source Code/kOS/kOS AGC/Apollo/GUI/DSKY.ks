@@ -1,5 +1,6 @@
 
 
+
 IF AG1 { AG1 OFF.}
 IF AG2 { AG2 OFF. }
 
@@ -1931,6 +1932,12 @@ LOCAL FUNCTION DSKY_REFRESH {
                 
             }
         }
+        IF kOSAGCCONFIG:JSONoutput AND DISPLAYABLE {
+            DSKY_JSON_OUTPUT().
+        }
+        IF kOSAGCCONFIG:TERMinput and CHUNKnumber = 5 or chunkNumber = 10  {
+            DSKY_JSON_INPUT().
+        }
     } ELSE {
         // we do this by chunks, see top of file
         local _Dout is DSPOUT:COPY.
@@ -2535,8 +2542,18 @@ FUNCTION DSKY_DOACTION {
 
 FUNCTION DSKY_JSON_OUTPUT {
     // outputs to a file named "DSKY.json"
-    local _Doutput is DSPTAB:COPY.
+    local _Doutput is DSPOUT:COPY.
     local _Ioutput is INDTAB:COPY.
+
+    // Send NVFLASH
+    // Replicate the segments relevant and modify _Doutput to reflect this
+
+    IF NVFLASH {
+        IF NOT(FLSH) {
+            set _Doutput:VD to "bb".
+            set _Doutput:ND to "bb".
+        }
+    }
     IF NOT(_Ioutput:length >= 14) { return.}
     local _writelex is LEXICON(
         "COMP_ACTY", false,
