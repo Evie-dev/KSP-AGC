@@ -1,3 +1,8 @@
+
+
+IF AG1 { AG1 OFF.}
+IF AG2 { AG2 OFF. }
+
 LOCAL DISPLAYABLE IS FALSE.
 LOCAL TESTMODE IS FALSE.
 runOncePath("0:/Common/CommonFuncWrapper.ks").
@@ -86,14 +91,21 @@ FUNCTION DSKY_BLANKFUNC {}
 
 // N01
 
-local _N01_STEP IS "AWAIT".
+local MEMORY_ACCESS is LEXICON(
+    "STATE", "INACTIVE",
+    "STEPNAME", "SETECADR",
+    "AUTO_ECADR_STEP", FALSE,
+    "ECADR", -1
+).
+
+local FLAG_ACCESS IS LEXICON(
+    "STATE", "INACTIVE" // insure as to how implimentation of this will work
+).
 // steps:
 
 // AWAIT - NON-ACTIVE
 // ECADR - (skipped if sequential under the assumption that we set the starting ecadr *****DIRECTLY***** into R3)
 // DATA - DATA to commit to the ECADR
-local _N01_ECADR is 0.
-local _N01_AUTOSEQUENTIAL is FALSE. // for use of P27
 
 // based on https://www.nasa.gov/wp-content/uploads/static/history/afj/ap11fj/a11csmoc/a11-csmoc-f2-05.jpg
 
@@ -1126,15 +1138,15 @@ FUNCTION setAGCtextures {
     // Indicators
 
     IF forVehicle = "CSM" or forMission < 11 {
-        _indicatorAtlas:add("BLANK").
-        _indicatorAtlas:add("BLANK").
-        _indicatorAtlas:add("BLANK").
-        _indicatorAtlas:add("BLANK").
+        _indicatorAtlas:add("NULL").
+        _indicatorAtlas:add("NULL").
+        _indicatorAtlas:add("NULL").
+        _indicatorAtlas:add("NULL").
     } ELSE {
         IF forMission < 15 {
-            _indicatorAtlas:add("BLANK").
+            _indicatorAtlas:add("NULL").
             _indicatorAtlas:add("ALT").
-            _indicatorAtlas:add("BLANK").
+            _indicatorAtlas:add("NULL").
             _indicatorAtlas:add("VEL").
         } ELSE {
             _indicatorAtlas:add("PRIO DISP").
@@ -1312,13 +1324,11 @@ LOCAL FUNCTION ENTER {
 
     // N01-N03 PROCESSING...
     local D2 is DSPOUT:COPY.
-
-   IF DO_NOUN_PROCESSOR() {
+    IF NOUN_PROCESSOR_CONTROL() {
         NOUN_PROCESSOR().
-        return.
-   }
-    
-    VERB_PROCESSOR(DSPOUT:VD, true).
+    } ELSE {
+        VERB_PROCESSOR(DSPOUT:VD, true).
+    }
 }
 
 LOCAL FUNCTION PRO {
@@ -1344,6 +1354,12 @@ LOCAL FUNCTION RESET {
 
 LOCAL FUNCTION KEY_RELEASE {
     set DSPLOCK TO FALSE.
+    IF MEMORY_ACCESS:STEPNAME = "POST" {
+        set MEMORY_ACCESS:STATE TO "INACTIVE".
+        set MEMORY_ACCESS:STEPNAME TO "SETECADR".
+        set MEMORY_ACCESS:AUTO_ECADR_STEP to false.
+        set MEMORY_ACCESS:ECADR to "-1".
+    }
     IF _KEYRELMONITOR { 
         SET _KEYREL TO TRUE.
         IF _KEYRELBYPASS { return. }
@@ -1371,124 +1387,135 @@ LOCAL FUNCTION SIGN {
     }
 }
 
+LOCAL FUNCTION NOUN_PROCESSOR_CONTROL {
+    parameter displayState is DSPOUT:COPY.
+
+    // returns a boolan based upon if NOUN_PROCESSOR should handle the specific ENTER passed
+
+    local _vd is displayState:VD.
+    local _nd is displayState:ND.
+
+    // we first get the list of applicable nouns we can use here
+
+    local _applicableNouns is LIST(
+        "01","02","03", // memory access
+        "15" // incriment machine address
+    ).
+    local _overrideVerbs is LIST("32","33","34","37","69","70","71","72","75").
+    IF _overrideVerbs:contains(_vd) { return false. }
+    IF _applicableNouns:contains(_nd) {
+        IF LIST("01","02","03"):contains(_nd) {
+            return true.
+        }
+        IF _nd = "15" and NOT(MEMORY_ACCESS:ECADR = -1) {
+            return true.
+        } ELSE {
+            return false.
+        }
+    }
+}
+
+
+local _N01ECADR is false.
+local _N01DATA is false.
+
+
+local _donePost is false.
+LOCAL FUNCTION NOUN_PROCESSOR {
+    parameter displayState is DSPOUT:COPY.
+
+    local _vd is displayState:VD.
+    local _nd is displayState:ND.
+
+    // provides an override for the verb processor to allow for the capability to modify nouns
+    local _processingMode is "READ".
+    IF LIST("01","02","03"):contains(_vd) {
+        // what step are we in?
+        set _processingMode to "READ".
+    }
+    ELSE IF _vd = "21" or _vd = "25" { // unsure as to why you'd need other things that arent 21 or 25 for this (25 for N07)
+        set _processingMode to "WRITE".
+    }
+
+    // both modes have the same access point, its just the end that differs
+
+    IF MEMORY_ACCESS:STATE = "INACTIVE" {
+        set MEMORY_ACCESS:STATE TO "ACTIVE".
+        set MEMORY_ACCESS:STEPNAME TO "SETECADR".
+        set MEMORY_ACCESS:AUTO_ECADR_STEP to false.
+        set MEMORY_ACCESS:ECADR to "-1".
+    }
+
+    IF MEMORY_ACCESS:STATE = "ACTIVE" {
+        set _donePost to false.
+        IF MEMORY_ACCESS:STEPNAME = "POST" {
+
+
+            set _donePost to true.
+        }
+        ELSE IF MEMORY_ACCESS:STEPNAME = "SETECADR" {
+            IF NOT(_N01ECADR) {
+                BLANK5("R1").
+                set INPLOCK to "R1".
+                set INPREMAIN TO 5.
+
+                set _N01ECADR to true.
+            } ELSE {
+
+                // now we diverge
+
+                
+                
+
+                // we now need to set the ECADR data
+
+                local _r1data is displayState:R1.
+
+                local _ECADRdata is "".
+
+                FOR i in _r1data {
+                    IF NOT(i = "b") { set _ECADRdata to _ECADRdata+i. }
+                }
+                set MEMORY_ACCESS:ECADR to _ECADRdata.
+                
+
+                set DSPOUT:R3 to "b"+stringLengthener(MEMORY_ACCESS:ECADR, 5, "b").
+
+                IF _processingMode = "READ" {
+                    set MEMORY_ACCESS:STEPNAME TO "POST".
+
+                    // put the data address stuff into R1
+
+                    set DSPOUT:R1 to EMEM_READ(MEMORY_ACCESS:ECADR:tonumber(0)).
+                } ELSE {
+                    set MEMORY_ACCESS:STEPNAME TO "SETDATA".
+                }
+            }
+        }
+
+        IF MEMORY_ACCESS:STEPNAME = "SETDATA" {
+            IF NOT(_N01DATA) {
+                BLANK5("R1").
+                SET INPLOCK to "R1".
+                set INPREMAIN to 5.
+
+                set _N01DATA to true.
+
+                // ENSURE that the ecadr is going to be displayed
+
+                set DSPOUT:R3 to "b"+stringLengthener(MEMORY_ACCESS:ECADR, 5, "b").
+            }
+
+
+        }
+        IF MEMORY_ACCESS:STEPNAME = "POST" AND NOT(_donePost) {
+
+        }
+    }
+}
 
 // Unsure which part this should be, assuming that this should be 
 
-LOCAL FUNCTION DO_NOUN_PROCESSOR {
-    parameter DISP is DSPOUT:COPY.
-    local _nd is DISP:ND.
-    local _vd is DISP:VD.
-    IF _vd = "33" { return false. }
-    IF LIST("01", "02", "03"):contains(_nd) {
-        return true.
-    }
-
-    return false.
-}
-LOCAL FUNCTION NOUN_PROCESSOR {
-    parameter displayState is DSPOUT:COPY.
-    local _nd is displayState:ND.
-    local _vd is displayState:VD.
-
-    // this function serves to allow for the usage of specific nouns that require the rest of the display to function
-
-    // step 1 - check for the following
-
-    // the NOUN is equal to 1, 2 or 3
-
-    print _nd.
-
-    IF LIST(1,2,3):contains(_nd:tonumber(-1)) {
-        // yes it does
-        IF _N01_STEP = "AWAIT" {
-            // now we want the address
-            set _N01_STEP to "ECADR".
-            BLANK5("R1").
-            set INPLOCK to "R1".
-            set INPREMAIN to 5.
-            set DECBRANCH to false.
-        } else if _N01_STEP = "ECADR" {
-            // ECADR step
-
-            // get the ECADR, place it into _N01_ECADR
-            local _tempecadr is displayState:R1.
-            local _formedECADR is "".
-            for i in _tempecadr {
-                IF NOT(i = "b") {
-                    set _formedECADR to _formedECADR+i.
-                }
-            }
-            // now we just remove the decimal point
-
-            set _N01_ECADR to _formedECADR.
-            IF _N01_ECADR:tonumber(-1) < 0 {
-                // opr err! (honestly idk what to do with this one)
-
-                return.
-            }
-
-            print "ECADR: " + _N01_ECADR.
-
-            BLANK5("R1"). // blank R1 and push to R3
-            BLANK5("R3").
-            set DSPOUT:R3 to "b" + stringLengthener(_N01_ECADR, 5, "b").
-            
-            set _N01_STEP to "DATA".
-            set INPREMAIN to 5.
-        } ELSE IF _N01_STEP = "ECADR2" {
-            local _tempecadr is _N01_ECADR.
-            local _formedECADR is "".
-            for i in _tempecadr {
-                IF NOT(i = "b") {
-                    set _formedECADR to _formedECADR+i.
-                }
-            }
-            // now we just remove the decimal point
-
-            set _N01_ECADR to _formedECADR.
-            IF _N01_ECADR:tonumber(-1) < 0 {
-                // opr err! (honestly idk what to do with this one)
-
-                return.
-            }
-
-            print "ECADR: " + _N01_ECADR.
-
-            BLANK5("R1"). // blank R1 and push to R3
-            BLANK5("R3").
-            set DSPOUT:R3 to "b" + stringLengthener(_N01_ECADR, 5, "b").
-            
-            set _N01_STEP to "DATA".
-            set INPLOCK to "R1".
-            set INPREMAIN to 5.
-        } 
-        ELSE IF _N01_STEP = "DATA" {
-            
-            // push the data into the ECADR provided...
-            local _definedECADR is _N01_ECADR:tonumber(-1):tostring.
-            EMEM_WRITE(_definedECADR, displayState:R1).
-            set _N01_STEP TO "AWAIT2".
-            IF _N01_AUTOSEQUENTIAL { NOUN_PROCESSOR(). }
-        } ELSE IF _N01_STEP = "AWAIT2" {
-            IF _N01_AUTOSEQUENTIAL {
-                local _dec is Tobase(8,10,_N01_ECADR:tonumber(-1)).
-                set _N01_ECADR to tobase(10,8,_dec+1):tostring.
-                set _N01_STEP to "ECADR2".
-                NOUN_PROCESSOR(). // hopefully doesnt cause an overflow
-            }
-        }
-        print "Step: " + _N01_STEP.
-        print "Mode: " + INPLOCK.
-        return.
-
-    } ELSE IF _nd = "15" and _N01_STEP = "AWAIT2" {
-        set _N01_STEP to "AWAIT".
-        NOUN_PROCESSOR().
-    } 
-    ELSE IF NOT(_N01_STEP = "AWAIT") { set _N01_STEP to "AWAIT". }
-
-    return.
-}
 LOCAL FUNCTION VERB_PROCESSOR {
     parameter processingVerb is DSPOUT:VD, fromEnter is false.
 
@@ -1531,6 +1558,7 @@ LOCAL FUNCTION VERB_PROCESSOR {
             } ELSE {
                 set _V21 to false.
                 IF NOT(_V24 or _V25) {
+                    
                     NOUN_WRITE(DSPOUT:COPY).
                 } ELSE {
                     set DSPOUT:VD to "22".
@@ -1768,6 +1796,26 @@ local _uiAG is 1.
 local _uiKey is false.
 local UIrun1 is true.
 LOCAL FUNCTION checkForUI {
+
+    IF NOT(uicurrentlyvisible) {
+        clearScreen.
+        print "Press AG1 to show the DSKY".
+
+        IF AG1 {
+            set uicurrentlyvisible to true.
+            _DSKY:show.
+            AG1 OFF.
+        }
+    } ELSE {
+        clearScreen.
+        print "Press AG1 to hide the DSKY".
+
+        IF AG1 {
+            set uicurrentlyvisible to false.
+            _DSKY:hide.
+            AG1 OFF.
+        }
+    }
     IF uiDisplayMode = "undefined" {
         set whatVech2 to whatVech().
         set vPart to whatCommand().
@@ -1941,6 +1989,19 @@ FUNCTION BLANK2 {
     }
 }
 
+FUNCTION SET_INPLOCK {
+    parameter newInplock is "R1".
+
+    IF LIST("MD", "VD", "ND"):contains(newInplock) {
+        BLANK2(newInplock).
+        set INPLOCK to newInplock.
+        set INPREMAIN to 2.
+    } ELSE IF LIST("R1","R2","R3"):contains(newInplock) {
+        BLANK5(newInplock).
+        set INPLOCK to newInplock.
+        set INPREMAIN to 5.
+    }
+}
 
 
 LOCAL FUNCTION updateAllDisplays {
@@ -2415,9 +2476,11 @@ FUNCTION DSKY_SETFLAG {
             displayDriver("ND", DSPOUT:ND).
         }
     }
-    ELSE IF flagname = "N01AUTOSEQUENTIAL" { set _N01_AUTOSEQUENTIAL to newValue. }
-    ELSE IF flagname = "N01ECADR" { set _N01_ECADR to newValue. }
-    ELSE IF flagname = "N01STEP" { set _N01_STEP to newValue. }
+    
+    ELSE IF flagname = "MEMACCESS_ECADR" { set MEMORY_ACCESS:ECADR to newValue. }
+    ELSE IF flagname = "MEMACCESS_STEPNAME" { set MEMORY_ACCESS:STEPNAME to newValue. }
+    ELSE IF flagname = "MEMACCESS_AUTOSTEP" { set MEMORY_ACCESS:AUTO_ECADR_STEP to newValue. }
+
     ELSE IF flagname = "MONITORKEYREL" { set _KEYRELMONITOR to newValue. }
     ELSE IF flagname = "KEYRELBYPASS" { set _KEYRELBYPASS to newValue. }
 
