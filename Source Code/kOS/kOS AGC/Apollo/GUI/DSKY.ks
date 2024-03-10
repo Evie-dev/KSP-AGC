@@ -2569,7 +2569,11 @@ FUNCTION DSKY_JSON_OUTPUT {
         IF NOT(FLSH) { set _Ioutput[8] to false. }
     }
     local _writelex is LEXICON(
+        "FLASH", FLSH,
+        "NVFLASH", NVFLASH,
+
         "COMP_ACTY", false,
+
         "MD1", _Doutput:MD[0],
         "MD2", _Doutput:MD[1],
         "VD1", _Doutput:VD[0],
@@ -2632,7 +2636,7 @@ FUNCTION DSKY_JSON_INPUT {
         IF TERMINAL:INPUT:haschar {
             local _ichar is TERMINAL:INPUT:getchar().
 
-            KEYRUPT1(_ichar).
+            KEYRUPT1(PINBALL_TERMINAL_WORDS(_ichar)).
         }
     }
 }
