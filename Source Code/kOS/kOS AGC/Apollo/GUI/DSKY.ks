@@ -2629,13 +2629,10 @@ FUNCTION DSKY_JSON_OUTPUT {
 
 FUNCTION DSKY_JSON_INPUT {
     IF kOSAGCCONFIG:TERMinput {
-        IF EXISTS(_inputPath) {
-            local _DSKYinput is READJSON(_inputPath).
+        IF TERMINAL:INPUT:haschar {
+            local _ichar is TERMINAL:INPUT:getchar().
 
-            // expects a list
-
-
-
+            KEYRUPT1(_ichar).
         }
     }
 }
