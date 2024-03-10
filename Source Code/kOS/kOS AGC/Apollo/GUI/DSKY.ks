@@ -2618,7 +2618,6 @@ FUNCTION DSKY_JSON_OUTPUT {
         set _writelex["I" + iindx:tostring] to i.
         set iindx to iindx+1.
     }
-    IF FLSH an
     WRITEJSON(_writelex, _outputPath).
 
 
