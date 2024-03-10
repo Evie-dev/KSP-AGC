@@ -2033,6 +2033,7 @@ LOCAL FUNCTION displayDriver {
     IF forDisp = "MD" {
         set _DISP_MD1:image to getDisplayImage(displayInfo[0]).
         set _DISP_MD2:image to getDisplayImage(displayInfo[1]).
+        
     }
     ELSE IF forDisp = "VD" {
         set _DISP_VD1:image to getDisplayImage(displayInfo[0]).
@@ -2142,6 +2143,7 @@ LOCAL FUNCTION chunkDisplayDriver {
         set _DISP_R3D4:IMAGE to getDisplayImage(_chunkOUT[10][0]).
         set _DISP_R3D5:IMAGE TO getDisplayImage(_chunkOUT[10][1]).
     }
+    getDisplaySound().
     set _chunkTAB[chunkNumb] to _chunkOUT[chunkNumb].
     set DSPTAB to convertFromChunks(_chunkTAB).
 }
@@ -2149,6 +2151,46 @@ LOCAL FUNCTION chunkDisplayDriver {
 LOCAL FUNCTION getDisplayImage {
     parameter forChar is "".
     return _rootTextureFolder:Display + forChar +_fileEXT.
+}
+
+LOCAL FUNCTION getDisplaySound {
+    IF ADDONS:AGC:AVAILABLE {
+        IF ADDONS:AGC:HASSUFFIX("AGCCLICK") and ADDONS:AGC:HASSUFFIX("DOCLICK") {
+            IF ADDONS:AGC:DOCLICK {
+                ADDONS:AGC:AGCCLICK(1).
+            }
+        }
+    }
+}
+
+
+// ND-1021042
+
+// always will give a string back for more ease of use
+LOCAL FUNCTION getRelayCode {
+    parameter forDigit is 0.
+    // number -> relay code = forDigit type is NUMBER
+    // relay code -> number = fordigit is string
+
+    // gets the relay data for each digit (number of relays that are active, not number of relays that have changed)
+    local returnString is "".
+    local Relay_K1 is 0.
+    local Relay_K2 is 0.
+    local Relay_K3 is 0.
+    local Relay_K4 is 0.
+    local Relay_K5 is 0.
+
+    IF forDigit:istype("String") {
+        set Relay_K1 to forDigit[0]:tonumber(0).
+        set Relay_K2 to forDigit[1]:tonumber(0).
+        set Relay_K3 to forDigit[2]:tonumber(0).
+        set Relay_K4 to forDigit[3]:tonumber(0).
+        set Relay_K5 to forDigit[4]:tonumber(0).
+
+
+    } ELSE {
+
+    }
 }
 
 FUNCTION PINBALL_UPLINK_WORDS {

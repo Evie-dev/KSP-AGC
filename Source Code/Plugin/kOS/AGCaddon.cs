@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
+
+using System;
 using UnityEngine;
 using kOS;
 using kOS.AddOns;
@@ -27,6 +31,9 @@ namespace kOS.Addons.kOSAGC
             AddSuffix("REFTYPE", new Suffix<BooleanValue>(getRefreshType, "Chunk based refresh logic?"));
             AddSuffix("JSONoutput", new Suffix<BooleanValue>(getDisplayOutput, "Enable JSON writing for display buffer"));
             AddSuffix("TERMINALINPUT", new Suffix<BooleanValue>(getInputToggle, "Do we allow terminal input"));
+
+            AddSuffix("DOCLICK", new Suffix<BooleanValue>(doClicking, "Allow click"));
+            AddSuffix("AGCCLICK", new OneArgsSuffix<ScalarValue>(doAGCclick, "click"));
 
         }
 
@@ -85,6 +92,21 @@ namespace kOS.Addons.kOSAGC
             {
                 return false;
             }
+        }
+
+        private BooleanValue doClicking()
+        {
+            try
+            {
+                return HighLogic.CurrentGame.Parameters.CustomParams<kOSAGCSettings>().allowClickclickclickclickclick;
+            } catch { return false; }
+        }
+
+        private void doAGCclick(ScalarValue clickNumber)
+        {
+            AGCsounds Asounds = new AGCsounds();
+
+            Asounds.playClick((double)clickNumber);
         }
 
         public override BooleanValue Available()

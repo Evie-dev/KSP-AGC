@@ -1,4 +1,8 @@
-﻿using KSPAchievements;
+﻿// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
+
+using KSPAchievements;
 using System;
 using UnityEngine;
 
@@ -46,6 +50,9 @@ namespace AGCextras
         public bool doJSONoutput = false;
         [GameParameters.CustomParameterUI("Terminal Input", toolTip = "Enabling this will allow for the user to use the terminal GUI to input data\n" + "Format can be found in the README.md file from where you downloaded this", unlockedDuringMission = true)]
         public bool doTERMINALinput = false;
+
+        [GameParameters.CustomParameterUI("Allow Sounds", toolTip = "CLICK CLICK CLICK!", unlockedDuringMission = true)]
+        public bool allowClickclickclickclickclick = false;
         /*
          * 
          * Requirements: 

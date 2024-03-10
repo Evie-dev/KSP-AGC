@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;

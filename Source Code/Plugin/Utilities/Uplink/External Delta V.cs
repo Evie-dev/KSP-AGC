@@ -1,4 +1,8 @@
-﻿using KSPAchievements;
+﻿// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
+
+using KSPAchievements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
