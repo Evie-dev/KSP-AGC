@@ -2678,7 +2678,7 @@ FUNCTION DSKY_JSON_INPUT {
         IF TERMINAL:INPUT:haschar {
             local _ichar is TERMINAL:INPUT:getchar().
 
-            KEYBOARD_INPUT(PINBALL_TERMINAL_WORDS(_ichar)).
+            IF TERMINAL_WORDS:contains(_ichar) { KEYBOARD_INPUT(PINBALL_TERMINAL_WORDS(_ichar)). }
         }
     }
 }
