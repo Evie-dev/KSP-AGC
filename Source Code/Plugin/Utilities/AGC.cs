@@ -1,17 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using UnityEngine;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace AGCextras
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
+
+namespace AGCextras2.Utilities
 {
-    public class DSKY
+    public static class PINBALL
     {
-        public DSKYkeyboard keycodes = new DSKYkeyboard(); 
-    }
-    public class DSKYkeyboard
-    {
-        // this class contains methods and information regarding the DSKY structure itself
-
         private static readonly ReadOnlyCollection<string> _KEYPRESS = new ReadOnlyCollection<string>(new[]
         {
             "0",
@@ -122,7 +123,7 @@ namespace AGCextras
         }
 
 
-        public string getKeyruptWord(string keypress)
+        public static string getKeyruptWord(string keypress)
         {
             string keyruptWord = "";
             int keypressIndex = 0;
@@ -161,7 +162,7 @@ namespace AGCextras
             return keyruptWord;
         }
 
-        public string getUpruptWord(string keypress)
+        public static string getUpruptWord(string keypress)
         {
             string upruptWord = string.Empty;
             int upruptIndex = 0;
@@ -196,7 +197,7 @@ namespace AGCextras
             return upruptWord;
         }
 
-        public string getKeypress(string keycode, bool asInternal = false)
+        public static string getKeypress(string keycode, bool asInternal = false)
         {
             string returnKeypress = string.Empty;
 

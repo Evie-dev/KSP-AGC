@@ -88,7 +88,7 @@ GLOBAL scaleFactors is LEXICON(
 // EMEM_WRITE(ADDR, newValue)
 
 FUNCTION EMEM_CREATE {
-    parameter ADDR, isOctal is false, allowLoad is true.
+    parameter ADDR,scaleFactor is "raw", isOctal is false, allowLoad is true.
     IF ADDR:istype("List") {
         // indicates an array
         local lLENGTH IS 0.
@@ -128,7 +128,7 @@ FUNCTION EMEM_ADDRESS {
 }
 
 FUNCTION EMEM_READ {
-    parameter ADDR.
+    parameter ADDR, asRaw is true.
     local rval is false.
     IF ADDR:istype("Scalar") {
         // numeric address!
@@ -164,7 +164,7 @@ FUNCTION EMEM_READ {
 }
 
 FUNCTION EMEM_WRITE {
-    parameter ADDR, newData.
+    parameter ADDR, newData, asRaw is true.
     IF NOT(ADDR:TONUMBER(-1) = -1) {
         set ADDR TO ADDR:TONUMBER(-1).
     }
@@ -173,6 +173,9 @@ FUNCTION EMEM_WRITE {
         IF ADDRASSIGN:haskey(ADDR:tostring) {
             set ADDR to ADDRASSIGN[ADDR:tostring]. // set back to memomic!
         }
+    }
+    IF NOT(asRaw) {
+
     }
     IF EMEM:HASKEY(ADDR) {
         

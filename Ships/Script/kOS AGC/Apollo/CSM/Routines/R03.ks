@@ -22,7 +22,7 @@ LOCAL FUNCTION R03_MAINBODY {
         // F 04 46
         IF NOT(_V04N46) {
             DSKY_SETFLAG("DSPLOCK", false).
-            NVSUB(04,46, TRUE).
+            NVSUB(04,46, TRUE). // but this flashes?
             set _V04N46 to true.
         }
     } ELSE IF rstep = 1 {

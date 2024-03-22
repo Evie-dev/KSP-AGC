@@ -14,6 +14,9 @@ function getParts {
         }
     } ELSE IF forParts:istype("String") {
         set returnList to ship:partstagged(forParts).
+        IF returnList:empty {
+            set returnList to ship:partsnamed(forParts).
+        }
     } ELSE IF forParts:istype("Part") {
         returnList:add(forParts).
     }

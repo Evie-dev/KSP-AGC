@@ -15,7 +15,14 @@ FUNCTION VERB_PROCESSOR_EXTENDED {
         START_ROUTINE(3).
     } ELSE IF processingVerb = 49 {
         START_ROUTINE(62).
-    } ELSE IF processingVerb = 55 {
+    } ELSE IF processingVerb = 50 {
+        local _nRead is NOUN_READ(LEXICON("VD", "06", "ND", DSKY_GETDSPOUT():ND, "R1", "bbbbbb", "R2", "bbbbbb", "R3", "bbbbbb")).
+
+        set DSPOUT:R1 to _nRead[0].
+        set DSPOUT:R2 to _nRead[1].
+        set DSPOUT:R3 to _nRead[2].
+    } 
+    ELSE IF processingVerb = 55 {
         // CMC DELTATIME UPDATE
         DSKY_SETFLAG("DSPLOCK", FALSE).
         NVSUB(06, 24).

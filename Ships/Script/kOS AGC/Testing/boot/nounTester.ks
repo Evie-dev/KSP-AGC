@@ -1,1 +1,0 @@
-runOncePath("0:/kOS AGC/testing/noun.ks").

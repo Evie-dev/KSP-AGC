@@ -81,6 +81,17 @@ LOCAL FUNCTION ASSIGN_ERASABLES {
     EMEM_CREATE("N01_ECADR",true).
     local N01 is LEXICON("NOUN", 1, "R1", LIST("N01_INPUT", "A"), "R3", LIST("N01_ECADR", "A")).
     NL:add(N01).
+
+
+    //N09
+
+    EMEM_CREATE("FAILREG1").
+    EMEM_CREATE("FAILREG2").
+    EMEM_CREATE("FAILREG3").
+
+    local N09 is LEXICON("NOUN", 9, "R1", LIST("FAILREG1", "OCTAL"), "R2", LIST("FAILREG2", "OCTAL"), "R3", LIST("FAILREG3", "OCTAL")).
+
+    NL:add(N09).
     // N18
 
     EMEM_CREATE("THETAD").
@@ -106,6 +117,17 @@ LOCAL FUNCTION ASSIGN_ERASABLES {
 
     local N24 is LEXICON("NOUN", 24, "R1", LIST("TIME0", "K2"), "R2", LIST("TIME0", "K2"), "R3", LIST("TIME0", "K2")).
 
+    //N25 - CHECKLIST CODES
+
+    EMEM_CREATE("CHECKLIST1").
+    EMEM_CREATE("CHECKLIST2").
+    EMEM_CREATE("CHECKLIST3").
+    // store as a vector (sneaky heh)
+
+    local N25 is LEXICON("NOUN", 25, "R1", LIST("CHECKLIST1", "raw"), "R2", LIST("CHECKLIST2", "raw"), "R3", LIST("CHECKLIST3", "raw")).
+
+    NL:add(N25).
+
     // 32
 
     EMEM_CREATE("TPER").
@@ -115,6 +137,13 @@ LOCAL FUNCTION ASSIGN_ERASABLES {
     // N33
 
     EMEM_CREATE("TIG").
+    EMEM_CREATE("TIG_ADJUSTED").
+    EMEM_WRITE("TIG_ADJUSTED", FALSE).
+
+    EMEM_CREATE("P40_BURNTIME").
+    EMEM_WRITE("P40_BURNTIME", 0).
+    EMEM_CREATE("P40_CUTOFF").
+    EMEM_WRITE("P40_CUTOFF", 0).
     local N33 IS LEXICON("NOUN", 33, "R1", LIST("TIG", "K"), "R2", list("TIG", "K"), "R3", LIST("TIG", "K")).
     NL:ADD(N33).
     // n34 - unsure of implimentation, but i have some vauge idea?
@@ -257,6 +286,12 @@ LOCAL FUNCTION ASSIGN_ERASABLES {
 
     // N85 - residuals!
 
+    EMEM_CREATE("DELTAVRESIDUAL").
+
+    local N85 is LEXICON("NOUN", 85, "R1", LIST("DELTAVRESIDUALZ", "S"), "R2", LIST("DELTAVRESIDUALY", "S"), "R3", LIST("DELTAVRESIDUALX", "S")).
+    NL:ADD(N85).
+
+
     // N86
 
     local N86 is N81:COPY.
@@ -277,8 +312,7 @@ LOCAL FUNCTION ASSIGN_ERASABLES {
     EMEM_CREATE("TCO").
     EMEM_CREATE("PADALTI").
 
-    EMEM_CREATE("TIG_ADJUSTED_BY_P40").
-    EMEM_WRITE("TIG_ADJUSTED_BY_P40", false).
+    EMEM_CREATE("TIG_INST").  // INSTANT IMPULSE TIG
 
     EMEM_CREATE("PROGRAM").
     EMEM_CREATE("PROGRAM_STEP").
@@ -323,6 +357,7 @@ LOCAL FUNCTION ASSIGN_ERASABLES {
 
     // assign actual "addresses" to these items
 
+    // unsure, but we shall see hopefully
     EMEM_ADDRESS(2023, "PACTOFF").
     EMEM_ADDRESS(2024, "YACTOFF").
     EMEM_ADDRESS(3065, "DAPDATR1").
@@ -330,6 +365,10 @@ LOCAL FUNCTION ASSIGN_ERASABLES {
     EMEM_ADDRESS(3072, "LEMMAS").
     EMEM_ADDRESS(3073, "CSMMAS").
 
+
+    // P27 SPECIFIC (for now...) assignments
+
+    
 
     NOUN_CREATE(nounList).
 

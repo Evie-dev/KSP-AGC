@@ -1334,6 +1334,11 @@ LOCAL FUNCTION ENTER {
 }
 
 LOCAL FUNCTION PRO {
+    IF DSPOUT:VD = "99" {
+        IF DEFINED AGC_GUIDANCE_INFORMATION {
+            set AGC_GUIDANCE_INFORMATION:PERMIT:IGNITION to true.
+        }
+    }
     IF _PROMONITOR {
         set _PRO to true.
         IF _PROBYPASS { return. }
@@ -1449,70 +1454,11 @@ LOCAL FUNCTION NOUN_PROCESSOR {
     }
 
     IF MEMORY_ACCESS:STATE = "ACTIVE" {
-        set _donePost to false.
-        IF MEMORY_ACCESS:STEPNAME = "POST" {
-
-
-            set _donePost to true.
+        IF MEMORY_ACCESS:STEPNAME = "SETECADR" {
+            
         }
-        ELSE IF MEMORY_ACCESS:STEPNAME = "SETECADR" {
-            IF NOT(_N01ECADR) {
-                BLANK5("R1").
-                set INPLOCK to "R1".
-                set INPREMAIN TO 5.
+    } ELSE IF MEMORY_ACCESS:STATE = "ACTIVE-P27" {
 
-                set _N01ECADR to true.
-            } ELSE {
-
-                // now we diverge
-
-                
-                
-
-                // we now need to set the ECADR data
-
-                local _r1data is displayState:R1.
-
-                local _ECADRdata is "".
-
-                FOR i in _r1data {
-                    IF NOT(i = "b") { set _ECADRdata to _ECADRdata+i. }
-                }
-                set MEMORY_ACCESS:ECADR to _ECADRdata.
-                
-
-                set DSPOUT:R3 to "b"+stringLengthener(MEMORY_ACCESS:ECADR, 5, "b").
-
-                IF _processingMode = "READ" {
-                    set MEMORY_ACCESS:STEPNAME TO "POST".
-
-                    // put the data address stuff into R1
-
-                    set DSPOUT:R1 to EMEM_READ(MEMORY_ACCESS:ECADR:tonumber(0)).
-                } ELSE {
-                    set MEMORY_ACCESS:STEPNAME TO "SETDATA".
-                }
-            }
-        }
-
-        IF MEMORY_ACCESS:STEPNAME = "SETDATA" {
-            IF NOT(_N01DATA) {
-                BLANK5("R1").
-                SET INPLOCK to "R1".
-                set INPREMAIN to 5.
-
-                set _N01DATA to true.
-
-                // ENSURE that the ecadr is going to be displayed
-
-                set DSPOUT:R3 to "b"+stringLengthener(MEMORY_ACCESS:ECADR, 5, "b").
-            }
-
-
-        }
-        IF MEMORY_ACCESS:STEPNAME = "POST" AND NOT(_donePost) {
-
-        }
     }
 }
 
@@ -1539,15 +1485,25 @@ LOCAL FUNCTION VERB_PROCESSOR {
             set MONNOUN to "".
             set MONVERB to "".
         }
-        local currentDisplay is DSPTAB:copy.
-        local newDisplayOutput is LIST(DSPTAB:R1, DSPTAB:R2, DSPTAB:R3).
+        local currentDisplay is DSPOUT:copy.
+        local newDisplayOutput is LIST(DSPOUT:R1, DSPOUT:R2, DSPOUT:R3).
         set newDisplayOutput to NOUN_READ(currentDisplay).
         set DSPOUT:R1 to newDisplayOutput[0].
         set DSPOUT:R2 to newDisplayOutput[1].
         SET DSPOUT:R3 to newDisplayOutput[2].
         IF fromEnter { set DSPLOCK to false. }
+
+        IF currentDisplay:ND = "09" {
+            DSKY_INDICATOR("PROG", false). // clear program flag
+        }
         return.
-    } ELSE { set MONFLAG to false. } // again, just to make sure its false 
+    } ELSE { 
+        set MONFLAG to false. 
+        set MONVERB to "".
+        set MONNOUN to "".
+        set AWAITREL to false.
+        DSKY_INDICATOR("KEY REL", FALSE).
+    } // again, just to make sure its false 
     IF processingVerb < 27 {
         IF processingVerb = 21 {
             set INPLOCK to "NONE".
@@ -1673,6 +1629,7 @@ LOCAL FUNCTION VERB_PROCESSOR {
 
 FUNCTION NVSUB {
     parameter _verb is MONVERB, _noun is MONNOUN, doFlash is false.
+    
     IF DSPLOCK {
         set AWAITREL to true.
         set RELVERB TO _verb.
@@ -1696,6 +1653,8 @@ FUNCTION NVSUB {
         set DSPOUT:VD to _verb.
         set DSPOUT:ND to _noun.
         set NVFLASH to doFlash.
+
+        set MONFLAG TO FALSE.
         ENTER().
         
     }
@@ -2232,6 +2191,14 @@ FUNCTION PINBALL_TERMINAL_WORDS {
 
 FUNCTION DSKY_INDICATOR {
     parameter ID is 0, newState is false.
+    IF ID:istype("String") {
+        // attempt to convert string to index
+
+        IF _indicatorAtlas:contains(ID) {
+            local _ID2 is _indicatorAtlas:indexof(ID).
+            set ID to _ID2.
+        }
+    }
     IF ID < 0 or ID >= INDOUT:length { return. }
     set INDOUT[ID] to newState.
 }
@@ -2579,6 +2546,25 @@ FUNCTION DSKY_GETFLAG {
 
     ELSE IF flagname = "DECBRANCH" { set rflag to DECBRANCH. }
     return rflag.
+}
+
+
+// ALARMS
+
+FUNCTION DSKY_THROWALARM {
+    parameter alarmthrown is "bbbbb".
+
+    local oldAlarmData is LIST(
+        EMEM_READ("FAILREG1"),
+        EMEM_READ("FAILREG2"),
+        EMEM_READ("FAILREG3")
+    ).
+
+    EMEM_WRITE("FAILREG1", alarmthrown).
+    EMEM_WRITE("FAILREG2", oldAlarmData[0]).
+    EMEM_WRITE("FAILREG3", oldAlarmData[1]).
+
+    DSKY_INDICATOR("PROG").
 }
 
 FUNCTION DSKY_DOACTION {

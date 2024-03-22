@@ -12,6 +12,8 @@ local vmagi is 0.
 local padalti is 0.
 local hdot is 0.
 
+
+local isProbably_SIVB is FALSE.
 FUNCTION P11_INIT {
     parameter asRestart is false.
     IF LIST("LANDED", "SPLASHED", "PRELAUNCH"):contains(SHIP:STATUS) { return. }
@@ -33,13 +35,22 @@ FUNCTION P11_INIT {
 LOCAL FUNCTION P11_MAINBODY {
     local pstep is EMEM_READ("PROGRAM_STEP").
     P11_VARUPDATER().
-    P11_DISPLAY().
+
+    // EVENTUALLY I SHALL HAVE STEPS BASED UPON DIFFERENT ABORT MODES
+
+
     IF pstep = 0 {
+        P11_DISPLAY().
         IF altitude > FL3000 {
             PNEXT_STEP().
         }
     } ELSE IF pstep = 1 {
-        
+        IF mass < 200 and maxthrust = 0 {
+            
+        }
+        IF EMEM_READ("ROUTINE") = 30  {
+            P11_DISPLAY().
+        } 
     }
 }
 
@@ -56,3 +67,16 @@ LOCAL FUNCTION P11_DISPLAY {
         set _P11lastrefresh to time:seconds.
     }
 }
+
+
+
+// ABORT MODES
+
+
+// BASED UPON THIS
+
+// https://ntrs.nasa.gov/api/citations/19720017278/downloads/19720017278.pdf
+// and
+// https://ntrs.nasa.gov/api/citations/19730010175/downloads/19730010175.pdf
+
+

@@ -14,24 +14,11 @@ FUNCTION P30_INIT {
     set _V06N81 to false.
     set _V16N45 to false.
 
-    // temporary thing
+    // temporary thing -> P27
 
-    IF hasnode {
-        local _nd is nextNode.
+    // For lack of confusion, we take the node time directly from TIG_INST
 
-        local _x is _nd:prograde.
-        local _y is _nd:normal.
-        local _z is _nd:radialout.
-
-        local _TIG is _nd:TIME-EMEM_READ("TIME0").
-
-        EMEM_WRITE("TIG", _TIG).
-        EMEM_WRITE("DETLAVLVC", v(_z,_y,_x)).
-
-        remove _nd.
-    } ELSE {
-        return.
-    }
+    EMEM_WRITE("TIG", EMEM_READ("TIG_INST")).
     EMEM_WRITE("PROGRAM", 30).
     DSKY_SETMAJORMODE("30").
     set PROGRAM_FUNCTION to P30_MAINBODY@.
@@ -40,11 +27,10 @@ FUNCTION P30_INIT {
 
 LOCAL FUNCTION P30_MAINBODY {
     local pstep is EMEM_READ("PROGRAM_STEP").
-
     IF pstep = 0 {
         IF NOT(_V06N33) {
             DSKY_SETFLAG("DSPLOCK", FALSE).
-            NVSUB(6, 33, TRUE).
+            NVSUB(6, 33, TRUE). // why is this not flashing?
             set _V06N33 to true.
         }
         
@@ -54,16 +40,20 @@ LOCAL FUNCTION P30_MAINBODY {
             NVSUB(6, 81, TRUE).
             set _V06N81 to true.
         }
-    } ELSE IF pstep = 2{
+    } ELSE IF pstep = 2 {
         // calculations
         EMEM_WRITE("TEVENT", EMEM_READ("TIG")).
         local _tig_ut is EMEM_READ("TIG")+EMEM_READ("TIME0").
         local _nodeData is orbMech_VMN(_tig_ut, EMEM_READ("DELTAVLVCZ"), EMEM_READ("DELTAVLVCY"), EMEM_READ("DELTAVLVCX"), false).
 
         EMEM_WRITE("DVTOTAL", _nodeData:V2:mag).
-        EMEM_WRITE("VGDISP", _nodeData:V1:mag-nodeData:V2:mag).
+        EMEM_WRITE("VGDISP", _nodeData:V2:mag-_nodeData:V1:mag). // reversed to make correct
         EMEM_WRITE("HAPO", _nodeData:COE:Apoapsis:a).
         EMEM_WRITE("HPER", _nodeData:COE:Periapsis:a).
+
+        // set the pointing vector
+
+        EMEM_WRITE("THETAD", _nodeData:bvr).
         PNEXT_STEP().
     } ELSE IF pstep = 3 {
         IF NOT(_V06N42) {
@@ -77,5 +67,7 @@ LOCAL FUNCTION P30_MAINBODY {
             NVSUB(16, 45).
             set _V16N45 TO TRUE.
         }
+    } ELSE IF pstep = 5 {
+        GOTO_P00H().
     }
 }

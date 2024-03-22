@@ -12,12 +12,17 @@ using KSP;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
+// Copyright (c) 2024 The Developers of KSP-AGC (Evie-dev)
+// License: MIT
+
+// Sounds from Apollo Simulation Peripheral Lab
+
 namespace AGCextras
 {
-    [KSPAddon(KSPAddon.Startup.Flight,false)]
+    [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class AGCsounds : MonoBehaviour
     {
-        List<string> singleClick = new List<string>() { "kOS-Addons/AGC/Sounds/clicks1_0", "kOS-Addons/AGC/Sounds/clicks1_1","kOS-Addons/AGC/Sounds/clicks1_2","kOS-Addons/AGC/Sounds/clicks1_3","kOS-Addons/AGC/Sounds/clicks1_4" };
+        List<string> singleClick = new List<string>() { "kOS-Addons/AGC/Sounds/clicks1_0", "kOS-Addons/AGC/Sounds/clicks1_1", "kOS-Addons/AGC/Sounds/clicks1_2", "kOS-Addons/AGC/Sounds/clicks1_3", "kOS-Addons/AGC/Sounds/clicks1_4" };
         List<string> dualClick = new List<string>() { "kOS-Addons/AGC/Sounds/clicks2_0", "kOS-Addons/AGC/Sounds/clicks2_1", "kOS-Addons/AGC/Sounds/clicks2_2", "kOS-Addons/AGC/Sounds/clicks2_3", "kOS-Addons/AGC/Sounds/clicks2_4" };
         List<string> tripleClick = new List<string>() { "kOS-Addons/AGC/Sounds/clicks3_0", "kOS-Addons/AGC/Sounds/clicks3_1", "kOS-Addons/AGC/Sounds/clicks3_2", "kOS-Addons/AGC/Sounds/clicks3_3", "kOS-Addons/AGC/Sounds/clicks3_4" };
         List<string> fourClicks = new List<string>() { "kOS-Addons/AGC/Sounds/clicks4_0", "kOS-Addons/AGC/Sounds/clicks4_1", "kOS-Addons/AGC/Sounds/clicks4_2", "kOS-Addons/AGC/Sounds/clicks4_3", "kOS-Addons/AGC/Sounds/clicks4_4" };
@@ -40,7 +45,7 @@ namespace AGCextras
             Debug.Log("[kOS AGC SOUNDS] Loading sounds!");
 
             vesselActive = FlightGlobals.ActiveVessel;
-            if(vesselActive == null)
+            if (vesselActive == null)
             {
                 return;
             }
@@ -50,7 +55,7 @@ namespace AGCextras
 
         void createClicker()
         {
-            if(clickerCreated) { return; }
+            if (clickerCreated) { return; }
             vesselActive = FlightGlobals.ActiveVessel;
             GameObject kOSaudio = new GameObject("kOS AUDIO");
             kOSaudio.transform.parent = vesselActive.gameObject.transform;
@@ -69,11 +74,12 @@ namespace AGCextras
                 createClicker();
             }
             int randomClicks = clickInstantiate.Next(0, 4);
-            
+
             if (clickNumber == 1)
             {
                 clickFiles = singleClick;
-            } else if (clickNumber == 2) { clickFiles = dualClick; }
+            }
+            else if (clickNumber == 2) { clickFiles = dualClick; }
             else if (clickNumber == 3) { clickFiles = tripleClick; }
             else if (clickNumber == 4) { clickFiles = fourClicks; }
             else if (clickNumber == 5) { clickFiles = fiveClicks; }

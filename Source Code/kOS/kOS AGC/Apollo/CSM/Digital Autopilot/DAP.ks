@@ -8,5 +8,6 @@
 runOncePath("0:/kOS AGC/Apollo/CSM/Digital Autopilot/DAP_functions.ks").
 
 GLOBAL DAP IS LEXICON(
+    "WEIGHT", 0
 
 ).

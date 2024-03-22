@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AGCextras")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("AGCextrasv2")]
+[assembly: AssemblyDescription("version 2")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("AGCextras")]
+[assembly: AssemblyProduct("AGCextras2")]
 [assembly: AssemblyCopyright("Copyright ©  2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("4e2e8ab9-4a4d-433c-ac90-e44bda1a0df8")]
+[assembly: Guid("903da044-5f3d-42e6-b5a3-93ed89b49d27")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -33,5 +33,5 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("0.1")]
+[assembly: AssemblyFileVersion("2.0.0.1")] // v(2.0).0.1
 [assembly: KSPAssemblyDependency("kOS", 1, 1)]
