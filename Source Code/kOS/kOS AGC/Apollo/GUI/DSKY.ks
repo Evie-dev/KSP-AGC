@@ -9,6 +9,7 @@ LOCAL DISPLAYABLE IS FALSE.
 LOCAL TESTMODE IS FALSE.
 runOncePath("0:/Common/CommonFuncWrapper.ks").
 runOncePath("0:/kOS AGC/Apollo/MEM/EMEM.ks").
+runOncePath("0:/kOS AGC/Apollo/GUI/UPLINK.ks"). // soon :)
 local _rootTextureFolder is LEXICON(
     "Base", "kOS AGC Textures/DSKY/",
     "Display", "kOS AGC Textures/DSKY/DISPLAY/",
@@ -49,6 +50,9 @@ local REFRESHrate is 1/1.5.
 local CHUNKrefresh is false.
 LOCAL CHUNKnumber is 0.
 
+
+local _OUTPUTrate is 0.06. // change if needed
+local _lastOUTPUT is 0. // dont change
 
 
 // VERB FLAGS
@@ -116,16 +120,16 @@ local FLAG_ACCESS IS LEXICON(
 
 // kOS AGC CONFIG HOOK
 IF DEFINED(kOSAGCCONFIG) {
-    IF kOSAGCCONFIG:HASKEY("REFRATE") {
-        IF kOSAGCCONFIG:REFRATE {
+    IF kOSAGCCONFIG:HASKEY("REFRESHRATE_HISTORICAL") {
+        IF kOSAGCCONFIG:REFRESHRATE_HISTORICAL {
             set REFRESHrate to 1/1.5.
         } ELSE {
             set REFRESHrate to 0.
             set CHUNKrefresh to false. // if we instantly refresh we cant do the refresh rate
         }
     }
-    IF kOSAGCCONFIG:HASKEY("CHUNK") {
-        IF kOSAGCCONFIG:CHUNK {
+    IF kOSAGCCONFIG:HASKEY("CHUNK_REFRESH") {
+        IF kOSAGCCONFIG:CHUNK_REFRESH {
             IF NOT(REFRESHrate < 0.11) {
                 set REFRESHrate to REFRESHrate/11. // 11 chunks
                 set CHUNKrefresh to true.
@@ -294,7 +298,13 @@ local _KEYBRD_ROWCONTAINER7 is _DSKY_KEYBOARD:addvlayout.
 
 // UPLINK ACTIVITY
 
-local INDI_UPLINK is _DSKY_DISPLAY_INDICATOR1:addlabel().
+
+// this will be a button, heres my reasoning
+
+// UPLINK GUI!!!!!
+
+// heavy work in progress though, probably a late add item but i shall work on it
+local INDI_UPLINK is _DSKY_DISPLAY_INDICATOR1:addbutton().
 set INDI_UPLINK:style:height to _dskyGUIinfo:Size:Indicator[0].
 set INDI_UPLINK:style:width to _dskyGUIinfo:Size:Indicator[1].
 
@@ -1130,6 +1140,9 @@ set _KEYBRD_RSET:onclick to {KEYBOARD_INPUT("10010").}.
 set _KEYBRD_KEYREL:onclick to {KEYBOARD_INPUT("11001").}.
 
 
+// UPLINK GUI
+set DSKY_INDICATOR_UPLINK:onclick to { UPLINK_UI_TOGGLE(). }.
+
 // Now we can set the textures
 FUNCTION setAGCtextures {
     parameter forVehicle is "CSM", forMission is 17.
@@ -1346,11 +1359,13 @@ LOCAL FUNCTION PRO {
     IF DEFINED ROUTINES_ARE_AVAILABLE {
         IF NOT(EMEM_READ("ROUTINE") = -1){
             RNEXT_STEP().
+            return.
         }
     }
     IF DEFINED PROGRAMS_ARE_AVAILABLE {
         IF NOT(EMEM_READ("PROGRAM") = -1) {
-            PNEXT_STEP().
+            PNEXT_STEP(true).
+            return.
         }
     }
 }
@@ -1652,10 +1667,12 @@ FUNCTION NVSUB {
         }
         set DSPOUT:VD to _verb.
         set DSPOUT:ND to _noun.
-        set NVFLASH to doFlash.
-
         set MONFLAG TO FALSE.
         ENTER().
+        set NVFLASH to doFlash.
+
+        
+        
         
     }
 }
@@ -1749,6 +1766,11 @@ FUNCTION DSKY_UPDATE {
         // here we are updating MONITOR functionality
         NVSUB(MONVERB, MONNOUN).
         set lastMON to time:seconds.
+    }
+
+    IF ADDONS:AGC:ASPL and time:seconds > _lastOUTPUT+_OUTPUTrate {
+        DSKY_ASPL().
+        set _lastOUTPUT to time:seconds.
     }
 }
 
@@ -1895,12 +1917,6 @@ LOCAL FUNCTION DSKY_REFRESH {
                 
             }
         }
-        IF kOSAGCCONFIG:JSONoutput AND DISPLAYABLE {
-            DSKY_JSON_OUTPUT().
-        }
-        IF kOSAGCCONFIG:TERMinput AND DISPLAYABLE {
-            DSKY_JSON_INPUT().
-        }
     } ELSE {
         // we do this by chunks, see top of file
         local _Dout is DSPOUT:COPY.
@@ -1910,12 +1926,6 @@ LOCAL FUNCTION DSKY_REFRESH {
         chunkDisplayDriver(CHUNKnumber).
 
         set CHUNKnumber to CHUNKnumber+1.
-        IF kOSAGCCONFIG:JSONoutput AND DISPLAYABLE {
-            DSKY_JSON_OUTPUT().
-        }
-        IF kOSAGCCONFIG:TERMinput and CHUNKnumber = 5 or chunkNumber = 10  {
-            DSKY_JSON_INPUT().
-        }
         IF CHUNKnumber >= 11 {
             // (because we are indexing from zero)
             set FLSH to NOT(FLSH).
@@ -2575,6 +2585,13 @@ FUNCTION DSKY_DOACTION {
 
 local _inputPath is "0:/kOS AGC/DSKY/AGCinput.json".
 local _outputPath is "0:/kOS AGC/DSKY/AGCoutput.json".
+
+LOCAL FUNCTION DSKY_ASPL {
+    IF ADDONS:AGC:ASPL {
+        DSKY_JSON_OUTPUT().
+        DSKY_JSON_OUTPUT().
+    }
+}
 FUNCTION DSKY_JSON_OUTPUT {
     // outputs to a file named "DSKY.json"
     local _Doutput is DSPOUT:COPY.
