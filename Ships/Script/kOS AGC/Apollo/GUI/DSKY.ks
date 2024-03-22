@@ -2589,7 +2589,7 @@ local _outputPath is "0:/kOS AGC/DSKY/AGCoutput.json".
 LOCAL FUNCTION DSKY_ASPL {
     IF ADDONS:AGC:ASPL {
         DSKY_JSON_OUTPUT().
-        DSKY_JSON_OUTPUT().
+        DSKY_JSON_INPUT().
     }
 }
 FUNCTION DSKY_JSON_OUTPUT {
@@ -2677,12 +2677,10 @@ FUNCTION DSKY_JSON_OUTPUT {
 
 
 FUNCTION DSKY_JSON_INPUT {
-    IF kOSAGCCONFIG:TERMinput {
-        IF TERMINAL:INPUT:haschar {
-            local _ichar is TERMINAL:INPUT:getchar().
+    IF TERMINAL:INPUT:haschar {
+        local _ichar is TERMINAL:INPUT:getchar().
 
-            IF TERMINAL_WORDS:contains(_ichar) { KEYBOARD_INPUT(PINBALL_TERMINAL_WORDS(_ichar)). }
-        }
+        IF TERMINAL_WORDS:contains(_ichar) { KEYBOARD_INPUT(PINBALL_TERMINAL_WORDS(_ichar)). }
     }
 }
 
