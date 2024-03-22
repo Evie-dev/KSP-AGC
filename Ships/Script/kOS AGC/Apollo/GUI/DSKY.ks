@@ -1141,7 +1141,7 @@ set _KEYBRD_KEYREL:onclick to {KEYBOARD_INPUT("11001").}.
 
 
 // UPLINK GUI
-set DSKY_INDICATOR_UPLINK:onclick to { UPLINK_UI_TOGGLE(). }.
+set INDI_UPLINK:onclick to { UPLINK_UI_TOGGLE(). }.
 
 // Now we can set the textures
 FUNCTION setAGCtextures {
